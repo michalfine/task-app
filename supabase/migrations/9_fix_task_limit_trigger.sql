@@ -1,4 +1,6 @@
--- Function to check task limits against profile
+-- Fix task limit trigger to handle missing profile or usage_tracking data gracefully
+-- This prevents errors when new users create their first task
+
 CREATE OR REPLACE FUNCTION check_task_limit()
 RETURNS trigger
 SECURITY DEFINER
@@ -42,8 +44,3 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Add trigger to check limit before task insertion
-CREATE TRIGGER enforce_task_limit
-  BEFORE INSERT ON public.tasks
-  FOR EACH ROW
-  EXECUTE FUNCTION check_task_limit();

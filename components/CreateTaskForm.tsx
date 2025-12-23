@@ -22,8 +22,28 @@ export function CreateTaskForm({ onSubmit }: CreateTaskFormProps) {
       await onSubmit(title, description);
       setTitle("");
       setDescription("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create task");
+    } catch (err: any) {
+      // Provide more helpful error messages
+      let errorMessage = "Failed to create task";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
+      // Check for common database errors and provide user-friendly messages
+      if (errorMessage.includes("profile") || errorMessage.includes("user_id")) {
+        errorMessage = "User account setup incomplete. Please sign out and sign in again.";
+      } else if (errorMessage.includes("limit")) {
+        errorMessage = errorMessage; // Keep the limit message as-is
+      } else if (errorMessage.includes("permission") || errorMessage.includes("denied")) {
+        errorMessage = "Permission denied. Please contact support if this persists.";
+      }
+      
+      setError(errorMessage);
+      console.error("Task creation error:", err);
     } finally {
       setIsSubmitting(false);
     }

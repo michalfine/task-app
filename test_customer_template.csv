@@ -1,0 +1,5 @@
+CustomerID,Tenure,PreferredLoginDevice,CityTier,WarehouseToHome,PreferredPaymentMode,Gender,HourSpendOnApp,NumberOfDeviceRegistered,PreferedOrderCat,SatisfactionScore,MaritalStatus,NumberOfAddress,Complain,DaySinceLastOrder,OrderAmountHikeFromlastYear,CouponUsed,OrderCount,CashbackAmount
+TEST001,12.0,Mobile Phone,2,10.0,Debit Card,Male,3.0,4,Mobile Phone,3,Single,2,0,5.0,15.0,2.0,5.0,150.0
+TEST002,24.0,Computer,1,5.0,Credit Card,Female,4.5,3,Laptop & Accessory,4,Married,3,0,2.0,20.0,3.0,8.0,200.0
+TEST003,6.0,Phone,3,15.0,UPI,Male,2.0,2,Mobile,2,Single,1,1,10.0,5.0,1.0,2.0,50.0
+

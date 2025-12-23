@@ -1,0 +1,3 @@
+Tenure,PreferedOrderCat,Gender,Churn,WarehouseToHome,NumberOfDeviceRegistered,SatisfactionScore,MaritalStatus,NumberOfAddress,Complain,DaySinceLastOrder,CashbackAmount,HourSpendOnApp,OrderAmountHikeFromlastYear,CouponUsed,OrderCount,PreferredLoginDevice
+12.0,Mobile Phone,Male,0,10.0,4,3,Single,2,0,5.0,150.0,3.0,15.0,2.0,5.0,Mobile Phone
+

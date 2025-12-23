@@ -95,15 +95,23 @@ export function useAuth(): UseAuthReturn {
   };
 
   const handleGoogleLogin = async () => {
+    clearError();
     try {
-      await supabase.auth.signInWithOAuth({
+      // Let Supabase handle the redirect - it will redirect to /auth/v1/callback
+      // and then Supabase will redirect back to the app
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          // Redirect to auth callback route which will handle the session restoration
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
+      if (error) {
+        setError(error.message);
+        console.error("Error with Google login:", error);
+      }
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || "Failed to initiate Google login");
       console.error("Error with Google login:", error);
     }
   };
@@ -114,7 +122,9 @@ export function useAuth(): UseAuthReturn {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: `${window.location.origin}/` },
+        options: { 
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (error) {
@@ -130,28 +140,57 @@ export function useAuth(): UseAuthReturn {
 
   // Initialize auth state
   useEffect(() => {
+    let mounted = true;
+
     const initAuth = async () => {
       try {
+        // Get session first - this restores the session from storage
         const {
           data: { session },
+          error,
         } = await supabase.auth.getSession();
-        await updateSessionState(session);
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          if (mounted) {
+            setIsLoading(false);
+            setError(error.message);
+          }
+          return;
+        }
+
+        if (mounted) {
+          await updateSessionState(session);
+        }
       } catch (error: any) {
         console.error("Error initializing auth:", error);
-        setError(error.message);
-        await signOut();
+        if (mounted) {
+          setError(error.message);
+          setIsLoading(false);
+          setUser(null);
+          setSession(null);
+          setIsLoggedIn(false);
+        }
       }
     };
 
     initAuth();
 
+    // Listen for auth state changes (including OAuth callbacks and magic links)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      updateSessionState(session);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
+      
+      if (mounted) {
+        await updateSessionState(session);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return {

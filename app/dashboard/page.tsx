@@ -21,10 +21,16 @@ export default function Dashboard() {
     useTaskManager();
 
   const handleCreateTask = async (title: string, description: string) => {
-    await createTask(title, description);
-    await refreshTasks();
-    console.log(`New Task Created: ${title}`);
-    setIsDialogOpen(false);
+    try {
+      await createTask(title, description);
+      await refreshTasks();
+      console.log(`New Task Created: ${title}`);
+      setIsDialogOpen(false);
+    } catch (error: any) {
+      console.error("Error creating task:", error);
+      // Error is already handled by CreateTaskForm, but we can add additional handling here if needed
+      throw error; // Re-throw so CreateTaskForm can display it
+    }
   };
 
   return (
